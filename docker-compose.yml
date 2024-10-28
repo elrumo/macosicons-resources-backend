@@ -22,7 +22,7 @@ services:
       - ./package-lock.json:/opt/app/package-lock.json
       - ./.env:/opt/app/.env
       - ./public/uploads:/opt/app/public/uploads:rw
-      - uploads-data:/opt/app/public/uploads  # Changed to named volume
+      - strapi-uploads:/opt/app/public/uploads  # Changed to use named volume
     user: "node"  # This ensures the container runs as the node user
     ports:
       - '1337:1337'
@@ -37,6 +37,13 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
+  
+  volume-permissions:
+    image: busybox
+    user: "root"
+    command: chown -R 1000:1000 /opt/app/public/uploads
+    volumes:
+      - strapi-uploads:/opt/app/public/uploads
 
   strapiDB:
     container_name: strapiDB
