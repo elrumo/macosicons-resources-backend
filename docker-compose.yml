@@ -76,6 +76,7 @@ services:
 
 volumes:
   strapi-data:
+  uploads-data:  # Added named volume for uploads
 
 networks:
   strapi:
