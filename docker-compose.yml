@@ -23,13 +23,6 @@ services:
       - ./.env:/opt/app/.env
       - ./public/uploads:/opt/app/public/uploads:rw
     user: "node"  # This ensures the container runs as the node user
-    entrypoint: >
-      /bin/sh -c "
-      mkdir -p /opt/app/public/uploads &&
-      chown -R node:node /opt/app/public/uploads &&
-      chmod -R 755 /opt/app/public/uploads &&
-      node server.js
-      "
     ports:
       - '1337:1337'
     networks:
