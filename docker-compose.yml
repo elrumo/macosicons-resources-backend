@@ -21,11 +21,7 @@ services:
       - ./package.json:/opt/app/package.json
       - ./package-lock.json:/opt/app/package-lock.json
       - ./.env:/opt/app/.env
-      - type: bind
-        source: ./public/uploads
-        target: /opt/app/public/uploads
-        bind:
-          create_host_path: true
+      - ./public/uploads:/opt/app/public/uploads:rw
     user: "1000:1000"  # This ensures the container runs as the node user
     ports:
       - '1337:1337'
@@ -34,6 +30,12 @@ services:
     depends_on:
       strapiDB:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:1337/admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   strapiDB:
     container_name: strapiDB
