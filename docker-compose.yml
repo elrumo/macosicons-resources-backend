@@ -21,9 +21,8 @@ services:
       - ./package.json:/opt/app/package.json
       - ./package-lock.json:/opt/app/package-lock.json
       - ./.env:/opt/app/.env
-      - ./public/uploads:/opt/app/public/uploads:rw
-      - uploads-data:/opt/app/public/uploads  # Changed to named volume
-    user: "node"  # This ensures the container runs as the node user
+      - strapi-uploads:/opt/app/public/uploads  # Named volume for uploads
+    user: "node"
     ports:
       - '1337:1337'
     networks:
@@ -31,12 +30,6 @@ services:
     depends_on:
       strapiDB:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:1337/admin"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
 
   strapiDB:
     container_name: strapiDB
@@ -85,7 +78,7 @@ services:
 
 volumes:
   strapi-data:
-  uploads-data:  # Added named volume for uploads
+  strapi-uploads:  # Defined the volume here
 
 networks:
   strapi:
