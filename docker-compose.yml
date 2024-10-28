@@ -21,8 +21,12 @@ services:
       - ./package.json:/opt/app/package.json
       - ./package-lock.json:/opt/app/package-lock.json
       - ./.env:/opt/app/.env
-      - ./public/uploads:/opt/app/public/uploads
-      # - ./app:/opt/app
+      - type: bind
+        source: ./public/uploads
+        target: /opt/app/public/uploads
+        bind:
+          create_host_path: true
+    user: "1000:1000"  # This ensures the container runs as the node user
     ports:
       - '1337:1337'
     networks:
@@ -33,7 +37,7 @@ services:
 
   strapiDB:
     container_name: strapiDB
-    platform: linux/amd64
+    platform: linux/amd64 
     restart: unless-stopped
     env_file: .env
     image: mysql:8.0
