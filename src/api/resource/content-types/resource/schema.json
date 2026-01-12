@@ -27,6 +27,20 @@
     "slug": {
       "type": "uid",
       "targetField": "title"
+    },
+    "featureImageFile": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "pluginOptions": {
+        "upload": {
+          "config": {
+            "mimeTypes": [
+              "image/*"
+            ]
+          }
+        }
+      }
     }
   }
 }
