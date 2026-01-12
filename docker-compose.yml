@@ -71,9 +71,10 @@ services:
   volume-permissions:
     image: busybox
     user: "root"
-    command: sh -c "mkdir -p /opt/app/public/uploads && chown -R 1000:1000 /opt/app/public/uploads"
+    command: sh -c "mkdir -p /opt/app/public/uploads && chown -R 1000:1000 /opt/app/public/uploads && chown -R 1000:1000 /opt/app/src"
     volumes:
       - strapi-uploads:/opt/app/public/uploads
+      - ./src:/opt/app/src
 
 volumes:
   strapi-data:
