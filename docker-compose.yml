@@ -1,4 +1,3 @@
-version: '3'
 services:
   strapi:
     container_name: strapi
@@ -24,7 +23,7 @@ services:
       - strapi-uploads:/opt/app/public/uploads  # Named volume for uploads
     user: "node"
     ports:
-      - '1337:1337'
+      - '1338:1338'
     networks:
       - strapi
     depends_on:
