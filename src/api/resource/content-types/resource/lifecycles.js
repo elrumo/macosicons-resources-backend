@@ -30,7 +30,7 @@ async function populateFeatureImageUrl(data, event) {
 
     if (file && file.url) {
       // Set the feature_image field with the file URL
-      data.feature_image = file.url;
+      data.feature_image = `https://strapi.macosicons.com${file.url}`;
     }
   }
 }
