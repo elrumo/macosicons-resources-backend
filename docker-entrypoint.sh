@@ -5,7 +5,7 @@
 
 DB_HOST="${DATABASE_HOST:-strapiDB}"
 DB_PORT="${DATABASE_PORT:-3306}"
-MAX_ATTEMPTS=15
+MAX_ATTEMPTS=60
 SLEEP_SECS=2
 
 log() {
@@ -44,11 +44,14 @@ i=1
 while [ "$i" -le "$MAX_ATTEMPTS" ]; do
   v4_ip=$(getent ahostsv4 "$DB_HOST" 2>/dev/null | awk '{print $1}' | head -n1)
 
+  probe_err=""
   if [ -n "$v4_ip" ]; then
     case "${v4_ip}" in
-      127.*) ;;  # don't bother probing loopback
+      127.*) probe_err="resolved to loopback, skipped" ;;
       *)
-        if nc -z -w 3 "$v4_ip" "$DB_PORT" 2>/dev/null; then
+        probe_err=$(nc -v -w 3 -z "$v4_ip" "$DB_PORT" 2>&1 </dev/null)
+        probe_exit=$?
+        if [ "$probe_exit" -eq 0 ]; then
           log "ok: ${DB_HOST} -> ${v4_ip}:${DB_PORT} (attempt ${i})"
           exec "$@"
         fi
@@ -56,7 +59,9 @@ while [ "$i" -le "$MAX_ATTEMPTS" ]; do
     esac
   fi
 
-  log "attempt ${i}/${MAX_ATTEMPTS}: v4=${v4_ip:-<unresolved>} tcp=failed"
+  # busybox nc puts the failure reason on stderr; collapse to one line
+  probe_err_short=$(printf '%s' "$probe_err" | tr '\n' ' ' | sed 's/  */ /g')
+  log "attempt ${i}/${MAX_ATTEMPTS}: v4=${v4_ip:-<unresolved>} tcp=failed (${probe_err_short:-<no detail>})"
   i=$((i + 1))
   sleep "$SLEEP_SECS"
 done
