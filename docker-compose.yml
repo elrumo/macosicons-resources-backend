@@ -85,3 +85,10 @@ networks:
   strapi:
     name: Strapi
     driver: bridge
+    ipam:
+      config:
+        # Pinned to an uncommon /24 to avoid colliding with Dokploy-managed
+        # bridges (which default to 172.x.x.x). When two bridges share a
+        # subnet, containers can't reach each other across them even though
+        # their addresses look local.
+        - subnet: 10.55.0.0/24
