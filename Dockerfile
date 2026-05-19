@@ -20,11 +20,13 @@ RUN npm install mysql2
 WORKDIR /opt/app
 COPY . .
 ENV PATH=/opt/node_modules/.bin:$PATH
-RUN chown -R node:node /opt/app
+RUN chmod +x docker-entrypoint.sh \
+ && chown -R node:node /opt/app
 USER node
 
 RUN npm run build
 
 EXPOSE 1337
 
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["npm", "run", "start"]
