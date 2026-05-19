@@ -24,12 +24,26 @@ log "  getent ahostsv4 ${DB_HOST}:"
 getent ahostsv4 "$DB_HOST" 2>&1 | head -5 | sed 's/^/    /' || log "    <none>"
 log "  getent ahostsv6 ${DB_HOST}:"
 getent ahostsv6 "$DB_HOST" 2>&1 | head -5 | sed 's/^/    /' || log "    <none>"
+log "Network interfaces:"
+(ip -o -4 addr show 2>/dev/null || ifconfig 2>/dev/null) | sed 's/^/    /' || log "    <unavailable>"
+log "Routing table:"
+(ip -4 route 2>/dev/null || route -n 2>/dev/null) | sed 's/^/    /' || log "    <unavailable>"
+v4_first=$(getent ahostsv4 "$DB_HOST" 2>/dev/null | awk '{print $1}' | head -n1)
+if [ -n "$v4_first" ]; then
+  log "One-shot probes to ${DB_HOST} (${v4_first}):"
+  # 3306 = mysqld, 33060 = mysqlx (also listening per server logs). If 33060
+  # succeeds while 3306 times out, mysqld is selectively unreachable. If both
+  # time out, the issue is reachability of the host itself.
+  for probe_port in 3306 33060; do
+    result=$(nc -v -w 3 -z "$v4_first" "$probe_port" 2>&1 </dev/null)
+    log "  :${probe_port} -> $(printf '%s' "$result" | tr '\n' ' ' | sed 's/  */ /g')"
+  done
+fi
 log "================================================================"
 
 # Warn loudly if the target resolves to loopback - that's never a working
 # DB inside a container, and the most common cause is DATABASE_HOST=localhost
 # in .env or the strapi container's own hostname colliding with the DB name.
-v4_first=$(getent ahostsv4 "$DB_HOST" 2>/dev/null | awk '{print $1}' | head -n1)
 case "${v4_first}" in
   127.*|::1)
     log "WARNING: ${DB_HOST} resolves to loopback (${v4_first}). The DB is"
