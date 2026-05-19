@@ -23,6 +23,7 @@ services:
       - strapi-uploads:/opt/app/public/uploads  # Named volume for uploads
     user: "node"
     ports:
+      # - '1367:1367'
       - '1363:1363'
     networks:
       - strapi
