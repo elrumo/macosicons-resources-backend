@@ -41,6 +41,27 @@
           }
         }
       }
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "template",
+        "article",
+        "video"
+      ],
+      "default": "template",
+      "required": true
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "videoFile": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "videos"
+      ]
     }
   }
 }
